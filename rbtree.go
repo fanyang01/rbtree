@@ -1,3 +1,6 @@
+/*
+Package rbtree implements Red-Black Tree data structure on "Introduction to Algorithms".
+*/
 package rbtree
 
 import "errors"
