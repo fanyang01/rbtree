@@ -21,16 +21,22 @@ func (a Int) Compare(b Interface) int {
 }
 
 func TestNew(t *testing.T) {
-	treap := New()
+	rbt := New()
 	for i := 0; i < (Count); i++ {
 		I := Int(i)
-		treap.Insert(I)
+		rbt.Insert(I)
+	}
+	for i := 0; i < Count; i++ {
+		I := Int(i)
+		if _, err := rbt.Search(I); err != nil {
+			t.Fail()
+		}
 	}
 	var deleted [Count]bool
-	for i := 0; i < Count; i++ {
+	for i := 0; i < Count>>1; i++ {
 		I := Int(rand.Intn(Count))
 		if !deleted[int(I)] {
-			_, err := treap.Delete(I)
+			_, err := rbt.Delete(I)
 			if err != nil {
 				log.Println(int(I), err.Error())
 				t.Fail()
