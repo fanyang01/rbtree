@@ -76,13 +76,12 @@ func (t *RbTree) search(r *node, v interface{}) *node {
 	x := r
 	for x != t.null {
 		var cmp int
-		if cmp = t.compare(v, x.v); cmp == 0 {
-			return x
-		}
-		if cmp < 0 {
+		if cmp = t.compare(v, x.v); cmp < 0 {
 			x = x.left
-		} else {
+		} else if cmp > 0 {
 			x = x.right
+		} else {
+			return x
 		}
 	}
 	return nil
