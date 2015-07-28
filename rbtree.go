@@ -126,10 +126,7 @@ func (t *RbTree) Replace(v interface{}) (interface{}, bool) {
 	if before, ok = t.Delete(v); !ok {
 		return nil, false
 	}
-	if !t.Insert(v) {
-		return nil, false
-	}
-	return before, true
+	return before, t.Insert(v)
 }
 
 /*
@@ -209,7 +206,7 @@ func (t *RbTree) Delete(v interface{}) (interface{}, bool) {
 		z = x.left
 		t.transplant(x, x.left)
 	} else {
-		// y is the maxium node on x's right subtree
+		// y is the maximum node on x's right subtree
 		// it will replace x
 		y = func(n *node) *node {
 			for n.left != t.null {
