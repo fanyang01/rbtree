@@ -1,19 +1,11 @@
 /*
-Package rbtree implements Red-Black Tree data structure on "Introduction to Algorithms".
+Package rbtree implements red-black tree introduced in "Introduction to Algorithms".
 */
 package rbtree
 
-import "errors"
+import "github.com/fanyang01/tree/common"
 
-// Interface need to implement Compare method
-type Interface interface {
-	// Compare data of reciever with argument
-	// Return 0 if equal
-	// Return 1/-1 if greater/less
-	Compare(Interface) int
-}
-
-// BLACK and RED is color for edges
+// BLACK and RED is the color of nodes
 const (
 	BLACK = false
 	RED   = true
@@ -21,63 +13,70 @@ const (
 
 type node struct {
 	left, right, p *node
-	data           Interface
+	v              interface{}
 	color          bool
 }
 
-// RbTree is Red Black Tree
+// RbTree is a red-black tree
 type RbTree struct {
 	size       int
 	null, root *node
+	compare    common.CompareFunc
 }
 
-// New return an initialized tree
-func New() *RbTree {
+// New creates an initialized tree
+func New(f common.CompareFunc) *RbTree {
 	null := new(node)
 	null.p = null
 	null.right = null
 	null.left = null
-	null.data = nil
 	null.color = BLACK
 	return &RbTree{
-		size: 0,
-		null: null,
-		root: null,
+		size:    0,
+		null:    null,
+		root:    null,
+		compare: f,
 	}
 }
 
-// IsEmpty return true if the tree is empty
+// IsEmpty returns true if the tree is empty
 func (t *RbTree) IsEmpty() bool {
 	return t.size == 0
 }
 
-// Clean reset a tree structure to it's initial stat
+// Len returns size of t
+func (t *RbTree) Len() int {
+	return t.size
+}
+
+// Clean resets a tree structure to it's initial state
 func (t *RbTree) Clean() *RbTree {
 	t.size = 0
 	t.root = t.null
-	t.null = &node{
-		p:     t.null,
-		left:  t.null,
-		right: t.null,
-		color: BLACK,
-	}
 	return t
 }
 
-// Search return the element if found, or return non-nil error on not found
-func (t *RbTree) Search(data Interface) (Interface, error) {
-	x := t.search(t.root, data)
-	if x == nil {
-		return nil, errors.New("not found")
-	}
-	return x.data, nil
+// Has tests if v is already in t
+func (t *RbTree) Has(v interface{}) bool {
+	return t.search(t.root, v) != nil
 }
 
-func (t *RbTree) search(r *node, data Interface) *node {
+// Search tries to find the node containing v.
+// On success, it returns payload of the node and true,
+// otherwise, false will be returned to indicate the node is not found.
+func (t *RbTree) Search(v interface{}) (interface{}, bool) {
+	x := t.search(t.root, v)
+	if x == nil {
+		return nil, false
+	}
+	return x.v, true
+}
+
+func (t *RbTree) search(r *node, v interface{}) *node {
 	x := r
 	for x != t.null {
 		var cmp int
-		if cmp = data.Compare(x.data); cmp == 0 {
+		if cmp = t.compare(v, x.v); cmp == 0 {
 			return x
 		}
 		if cmp < 0 {
@@ -89,31 +88,49 @@ func (t *RbTree) search(r *node, data Interface) *node {
 	return nil
 }
 
-// Insert insert data into correct place
-func (t *RbTree) Insert(data Interface) {
+// Insert inserts v into correct place.
+// It will returns false when v is already in this tree.
+func (t *RbTree) Insert(v interface{}) bool {
 	x := t.root
-	n := t.newNode(data)
-	// n.color = RED
+	n := t.newNode(v)
 	p := t.null
 	var cmp int
 	for x != t.null {
 		p = x
-		if cmp = data.Compare(x.data); cmp < 0 {
+		if cmp = t.compare(v, x.v); cmp < 0 {
 			x = x.left
-		} else {
+		} else if cmp > 0 {
 			x = x.right
+		} else {
+			// Disable duplicate v
+			return false
 		}
 	}
 	n.p = p
 	if p == t.null {
 		t.root = n
-	} else if cmp = data.Compare(p.data); cmp < 0 {
+	} else if cmp = t.compare(v, p.v); cmp < 0 {
 		p.left = n
 	} else {
 		p.right = n
 	}
 	t.insertFix(n)
 	t.size++
+	return true
+}
+
+// Replace replaces payload of a node with new v.
+// It returns false when the node can't be found.
+func (t *RbTree) Replace(v interface{}) (interface{}, bool) {
+	var before interface{}
+	var ok bool
+	if before, ok = t.Delete(v); !ok {
+		return nil, false
+	}
+	if !t.Insert(v) {
+		return nil, false
+	}
+	return before, true
 }
 
 /*
@@ -176,11 +193,11 @@ func (t *RbTree) insertFix(x *node) {
 	t.root.color = BLACK
 }
 
-// Delete remove data from tree
-func (t *RbTree) Delete(data Interface) (Interface, error) {
-	x := t.search(t.root, data)
+// Delete removes v from t. It returns false when node containing v is not found.
+func (t *RbTree) Delete(v interface{}) (interface{}, bool) {
+	x := t.search(t.root, v)
 	if x == nil {
-		return nil, errors.New("not found")
+		return nil, false
 	}
 
 	var z *node
@@ -224,7 +241,7 @@ func (t *RbTree) Delete(data Interface) (Interface, error) {
 		t.deleteFix(z)
 	}
 	t.size--
-	return x.data, nil
+	return x.v, true
 }
 
 /*
@@ -324,12 +341,12 @@ func (t *RbTree) transplant(pos, n *node) {
 	n.p = pos.p
 }
 
-func (t *RbTree) newNode(data Interface) *node {
+func (t *RbTree) newNode(v interface{}) *node {
 	return &node{
 		left:  t.null,
 		right: t.null,
 		p:     t.null,
-		data:  data,
+		v:     v,
 		color: RED,
 	}
 }
