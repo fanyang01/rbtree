@@ -3,11 +3,14 @@ package rbtree
 import (
 	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/fanyang01/tree/common"
 )
 
 const Count = 1 << 19
+
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func Test(t *testing.T) {
 	n := 1 << 16
@@ -57,7 +60,7 @@ func Test(t *testing.T) {
 	}
 	deleted := make(map[int]bool)
 	for i := 0; i <= n/2; i++ {
-		random := rand.Intn(n/2 + 1)
+		random := r.Intn(n/2 + 1)
 		if _, ok := tr.Delete(random); ok {
 			if deleted[random] {
 				t.Error("Already deleted")
@@ -71,7 +74,7 @@ func Test(t *testing.T) {
 	}
 	tr.Clean()
 	for i := 0; i < n; i++ {
-		random := rand.Intn(n)
+		random := r.Intn(n)
 		tr.Insert(random)
 	}
 }
@@ -101,7 +104,7 @@ func BenchmarkDelete(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		i := rand.Intn(Count)
+		i := r.Intn(Count)
 		tr.Delete(i)
 	}
 }
