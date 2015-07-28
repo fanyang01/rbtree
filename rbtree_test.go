@@ -19,7 +19,7 @@ func Test(t *testing.T) {
 		t.Fail()
 	}
 	for i := 0; i < n; i++ {
-		if !tr.Insert(i) {
+		if _, ok := tr.Insert(i); !ok {
 			t.Fail()
 		}
 	}
@@ -32,40 +32,47 @@ func Test(t *testing.T) {
 	if tr.Has(-1) {
 		t.Fail()
 	}
-	if tr.Insert(0) {
+	if _, ok := tr.Insert(0); ok {
 		t.Fail()
 	}
-	if _, ok := tr.Delete(n + 1); ok {
-		t.Fail()
-	}
-	for i := n - 1; i > n/2; i-- {
-		if _, ok := tr.Delete(i); !ok {
+	for i := n - 1; i >= n/2; i-- {
+		handle, _ := tr.Search(i)
+		if _, ok := tr.Delete(handle); !ok {
 			t.Fail()
 		}
 		if _, ok := tr.Search(i); ok {
 			t.Fail()
 		}
 	}
-	for i := 0; i <= n/2; i++ {
+	if tr.Len() != n-n/2 {
+		t.Fail()
+	}
+	for i := 0; i < n/2; i++ {
 		v, ok := tr.Search(i)
-		if !ok || v != i {
+		if !ok || v.Value() != i {
 			t.Fail()
 		}
 	}
-	if _, ok := tr.Replace(0); !ok {
+	handle, _ := tr.Search(0)
+	if _, ok := tr.Replace(handle, 0); !ok {
 		t.Fail()
 	}
-	if _, ok := tr.Replace(-1); ok {
+	handle, _ = tr.Search(0)
+	if _, ok := tr.Replace(handle, 1); ok {
 		t.Fail()
 	}
 	deleted := make(map[int]bool)
-	for i := 0; i <= n/2; i++ {
-		random := r.Intn(n/2 + 1)
-		if _, ok := tr.Delete(random); ok {
-			if deleted[random] {
-				t.Error("Already deleted")
+	for i := 0; i < n/2; i++ {
+		random := r.Intn(n / 2)
+		var handle *Node
+		var ok bool
+		if handle, ok = tr.Search(random); ok {
+			if _, ok := tr.Delete(handle); ok {
+				if deleted[random] {
+					t.Error("Already deleted")
+				}
+				deleted[random] = true
 			}
-			deleted[random] = true
 		} else {
 			if !deleted[random] {
 				t.Error("Have not deleted")
@@ -105,6 +112,9 @@ func BenchmarkDelete(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		i := r.Intn(Count)
-		tr.Delete(i)
+		handle, ok := tr.Search(i)
+		if ok {
+			tr.Delete(handle)
+		}
 	}
 }
