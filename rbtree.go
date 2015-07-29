@@ -11,6 +11,7 @@ const (
 	RED   = true
 )
 
+// Node is the node in a tree
 type Node struct {
 	left, right, p *Node
 	color          bool
@@ -22,21 +23,21 @@ func (n *Node) Value() interface{} {
 	return n.v
 }
 
-// RbTree is a red-black tree
-type RbTree struct {
+// Tree is a red-black tree
+type Tree struct {
 	size       int
 	null, root *Node
 	compare    common.CompareFunc
 }
 
-// New creates an initialized tree
-func New(f common.CompareFunc) *RbTree {
+// New creates an initialized tree.
+func New(f common.CompareFunc) *Tree {
 	null := new(Node)
 	null.p = null
 	null.right = null
 	null.left = null
 	null.color = BLACK
-	return &RbTree{
+	return &Tree{
 		size:    0,
 		null:    null,
 		root:    null,
@@ -44,40 +45,47 @@ func New(f common.CompareFunc) *RbTree {
 	}
 }
 
-// IsEmpty returns true if the tree is empty
-func (t *RbTree) IsEmpty() bool {
+// IsEmpty returns true if the tree is empty.
+func (t *Tree) IsEmpty() bool {
 	return t.size == 0
 }
 
-// Len returns size of t
-func (t *RbTree) Len() int {
+// Len returns size of t.
+func (t *Tree) Len() int {
 	return t.size
 }
 
-// Clean resets a tree structure to it's initial state
-func (t *RbTree) Clean() *RbTree {
+// Clean resets a tree structure to it's initial state.
+func (t *Tree) Clean() *Tree {
 	t.size = 0
 	t.root = t.null
 	return t
 }
 
-// Has tests if v is already in t
-func (t *RbTree) Has(v interface{}) bool {
+// Has tests if v is already in t.
+func (t *Tree) Has(v interface{}) bool {
 	return t.search(t.root, v) != nil
 }
 
-// Search tries to find the node containing v.
-// On success, node contains v will be returned,
-// otherwise, false will be returned to indicate the node is not found.
-func (t *RbTree) Search(v interface{}) (*Node, bool) {
-	x := t.search(t.root, v)
-	if x == nil {
-		return nil, false
+// Replace replaces payload of a node with v.
+// v must be equal to previous payload.
+func (t *Tree) Replace(n *Node, v interface{}) (interface{}, bool) {
+	if t.compare(n.v, v) != 0 {
+		return n.v, false
 	}
-	return x, true
+	before := n.v
+	n.v = v
+	return before, true
 }
 
-func (t *RbTree) search(r *Node, v interface{}) *Node {
+// Search tries to find the node containing payload v.
+// On success, the node containing v will be returned,
+// otherwise, nil will be returned to indicate the node is not found.
+func (t *Tree) Search(v interface{}) *Node {
+	return t.search(t.root, v)
+}
+
+func (t *Tree) search(r *Node, v interface{}) *Node {
 	x := r
 	for x != t.null {
 		var cmp int
@@ -92,9 +100,9 @@ func (t *RbTree) search(r *Node, v interface{}) *Node {
 	return nil
 }
 
-// Insert inserts v into correct place.
-// It will returns false when v is already in this tree.
-func (t *RbTree) Insert(v interface{}) (*Node, bool) {
+// Insert inserts v into correct place and returns a handle.
+// It will refuse to insert v when v is already in t, and returns the node.
+func (t *Tree) Insert(v interface{}) (*Node, bool) {
 	x := t.root
 	n := t.newNode(v)
 	p := t.null
@@ -123,17 +131,6 @@ func (t *RbTree) Insert(v interface{}) (*Node, bool) {
 	return n, true
 }
 
-// Replace replaces payload of a node with new v.
-// It returns false when the node can't be found.
-func (t *RbTree) Replace(n *Node, v interface{}) (interface{}, bool) {
-	if t.compare(n.v, v) != 0 {
-		return n.v, false
-	}
-	before := n.v
-	n.v = v
-	return before, true
-}
-
 /*
  * 1.                B
  *                  / \
@@ -153,7 +150,7 @@ func (t *RbTree) Replace(n *Node, v interface{}) (interface{}, bool) {
  *               /
  *        x ->  R
  */
-func (t *RbTree) insertFix(x *Node) {
+func (t *Tree) insertFix(x *Node) {
 	var y *Node
 
 	for x.p.color == RED {
@@ -194,8 +191,17 @@ func (t *RbTree) insertFix(x *Node) {
 	t.root.color = BLACK
 }
 
-// Delete removes v from t. It returns false when node containing v is not found.
-func (t *RbTree) Delete(x *Node) (interface{}, bool) {
+// DeleteValue deletes the node whose payload is equal to v.
+// A boolean value is returned to indicate whether the node is found.
+func (t *Tree) DeleteValue(v interface{}) (interface{}, bool) {
+	if x := t.Search(v); x != nil {
+		return t.Delete(x), true
+	}
+	return nil, false
+}
+
+// Delete removes x from t and returns its payload.
+func (t *Tree) Delete(x *Node) interface{} {
 	var z *Node
 	y := x
 	color := x.color
@@ -237,7 +243,7 @@ func (t *RbTree) Delete(x *Node) (interface{}, bool) {
 		t.deleteFix(z)
 	}
 	t.size--
-	return x.v, true
+	return x.v
 }
 
 /*
@@ -268,7 +274,7 @@ func (t *RbTree) Delete(x *Node) (interface{}, bool) {
  *                          \
  *                           R
  */
-func (t *RbTree) deleteFix(x *Node) {
+func (t *Tree) deleteFix(x *Node) {
 	var y *Node
 
 	for x != t.root && x.color == BLACK {
@@ -326,7 +332,7 @@ func (t *RbTree) deleteFix(x *Node) {
 }
 
 // transplant s to the position of t
-func (t *RbTree) transplant(pos, n *Node) {
+func (t *Tree) transplant(pos, n *Node) {
 	if pos.p == t.null {
 		t.root = n
 	} else if pos == pos.p.left {
@@ -337,7 +343,7 @@ func (t *RbTree) transplant(pos, n *Node) {
 	n.p = pos.p
 }
 
-func (t *RbTree) newNode(v interface{}) *Node {
+func (t *Tree) newNode(v interface{}) *Node {
 	return &Node{
 		left:  t.null,
 		right: t.null,
@@ -360,7 +366,7 @@ func (t *RbTree) newNode(v interface{}) *Node {
  *        / \
  *       a   b
  */
-func (t *RbTree) leftRotate(x *Node) {
+func (t *Tree) leftRotate(x *Node) {
 	y := x.right
 	x.right = y.left
 	if y.left != t.null {
@@ -384,7 +390,7 @@ func (t *RbTree) leftRotate(x *Node) {
  *            / \
  *           b   c
  */
-func (t *RbTree) rightRotate(x *Node) {
+func (t *Tree) rightRotate(x *Node) {
 	y := x.left
 	x.left = y.right
 	if y.right != t.null {
