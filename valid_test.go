@@ -23,10 +23,7 @@ func TestValid(t *testing.T) {
 	}
 	for i := 0; i < n; i++ {
 		v := rand.Intn(n)
-		handle, ok := tr.Search(v)
-		if ok {
-			tr.Delete(handle)
-		}
+		tr.DeleteValue(v)
 	}
 	if !checkRbTree(tr) {
 		t.Error("Not a valid red black tree")

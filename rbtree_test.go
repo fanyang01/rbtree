@@ -6,80 +6,74 @@ import (
 	"time"
 
 	"github.com/fanyang01/tree/common"
+	"github.com/stretchr/testify/assert"
 )
-
-const Count = 1 << 19
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func Test(t *testing.T) {
+func TestAssert(t *testing.T) {
 	n := 1 << 16
 	tr := New(common.CompareInt)
-	if !tr.IsEmpty() {
-		t.Fail()
-	}
+	assert.True(t, tr.IsEmpty())
+
 	for i := 0; i < n; i++ {
-		if _, ok := tr.Insert(i); !ok {
-			t.Fail()
-		}
+		_, ok := tr.Insert(i)
+		assert.True(t, ok)
 	}
-	if tr.IsEmpty() {
-		t.Fail()
+	assert.False(t, tr.IsEmpty())
+	assert.Equal(t, n, tr.Len())
+	assert.False(t, tr.Has(-1))
+
+	_, ok := tr.Insert(0)
+	assert.False(t, ok)
+
+	assert.Nil(t, tr.Prev(tr.First()))
+	assert.Nil(t, tr.Next(tr.Last()))
+
+	for i, x := 0, tr.First(); i < n; i++ {
+		assert.NotNil(t, x)
+		assert.Equal(t, i, x.Value())
+		x = tr.Next(x)
 	}
-	if tr.Len() != n {
-		t.Fail()
+	for i, x := n-1, tr.Last(); i >= 0; i-- {
+		assert.NotNil(t, x)
+		assert.Equal(t, i, x.Value())
+		x = tr.Prev(x)
 	}
-	if tr.Has(-1) {
-		t.Fail()
-	}
-	if _, ok := tr.Insert(0); ok {
-		t.Fail()
-	}
+
 	for i := n - 1; i >= n/2; i-- {
-		handle, _ := tr.Search(i)
-		if _, ok := tr.Delete(handle); !ok {
-			t.Fail()
-		}
-		if _, ok := tr.Search(i); ok {
-			t.Fail()
-		}
+		tr.Delete(tr.Search(i))
+		assert.Nil(t, tr.Search(i))
 	}
-	if tr.Len() != n-n/2 {
-		t.Fail()
-	}
+	assert.Equal(t, n-n/2, tr.Len())
+
 	for i := 0; i < n/2; i++ {
-		v, ok := tr.Search(i)
-		if !ok || v.Value() != i {
-			t.Fail()
-		}
+		v := tr.Search(i)
+		assert.NotNil(t, v)
+		assert.Equal(t, i, v.Value())
 	}
-	handle, _ := tr.Search(0)
-	if _, ok := tr.Replace(handle, 0); !ok {
-		t.Fail()
-	}
-	handle, _ = tr.Search(0)
-	if _, ok := tr.Replace(handle, 1); ok {
-		t.Fail()
-	}
+
+	_, ok = tr.Replace(tr.Search(0), 0)
+	assert.True(t, ok)
+	_, ok = tr.Replace(tr.Search(0), 1)
+	assert.False(t, ok)
+
 	deleted := make(map[int]bool)
 	for i := 0; i < n/2; i++ {
 		random := r.Intn(n / 2)
-		var handle *Node
-		var ok bool
-		if handle, ok = tr.Search(random); ok {
-			if _, ok := tr.Delete(handle); ok {
-				if deleted[random] {
-					t.Error("Already deleted")
-				}
-				deleted[random] = true
-			}
+		if _, ok := tr.DeleteValue(random); ok {
+			assert.False(t, deleted[random])
+			deleted[random] = true
 		} else {
-			if !deleted[random] {
-				t.Error("Have not deleted")
-			}
+			assert.True(t, deleted[random])
 		}
 	}
+
 	tr.Clean()
+	assert.Equal(t, 0, tr.Len())
+	assert.Nil(t, tr.First())
+	assert.Nil(t, tr.Last())
+
 	for i := 0; i < n; i++ {
 		random := r.Intn(n)
 		tr.Insert(random)
@@ -104,6 +98,7 @@ func BenchmarkSearch(b *testing.B) {
 		tr.Search(i)
 	}
 }
+
 func BenchmarkDelete(b *testing.B) {
 	tr := New(common.CompareInt)
 	for i := 0; i < b.N; i++ {
@@ -111,10 +106,7 @@ func BenchmarkDelete(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		i := r.Intn(Count)
-		handle, ok := tr.Search(i)
-		if ok {
-			tr.Delete(handle)
-		}
+		v := r.Intn(b.N)
+		tr.DeleteValue(v)
 	}
 }
