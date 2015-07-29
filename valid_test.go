@@ -31,7 +31,7 @@ func TestValid(t *testing.T) {
 }
 
 func checkRbTree(t *Tree) bool {
-	if t.root.color != BLACK || t.null.color != BLACK {
+	if t.root != nil && t.root.color != BLACK {
 		return false
 	}
 	h := new(Height)
@@ -40,23 +40,26 @@ func checkRbTree(t *Tree) bool {
 }
 
 func checkColor(t *Tree, n *Node) bool {
-	checkNode := func(n *Node) bool {
-		if n.color == RED {
-			if n.left.color != BLACK || n.right.color != BLACK {
+	if n == nil {
+		return true
+	}
+	checkNode := func(x *Node) bool {
+		if x.color == RED {
+			if !isBlack(x.left) || !isBlack(x.right) {
 				return false
 			}
 		}
 		return true
 	}
 	ok := checkNode(n)
-	if !ok || n == t.null {
-		return ok
+	if !ok {
+		return false
 	}
 	return checkColor(t, n.left) && checkColor(t, n.right)
 }
 
 func (h *Height) checkHeight(t *Tree, n *Node, height int) bool {
-	if n == t.null {
+	if n == nil {
 		if h.set {
 			if height != h.height {
 				return false
