@@ -46,6 +46,11 @@ func New(f common.CompareFunc) *Tree {
 	}
 }
 
+// Root returns the root of t.
+func (t *Tree) Root() *Node {
+	return t.root
+}
+
 // IsEmpty returns true if the tree is empty.
 func (t *Tree) IsEmpty() bool {
 	return t.size == 0
