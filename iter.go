@@ -68,13 +68,15 @@ func (t *Tree) Prev(n *Node) *Node {
 	return x.p
 }
 
+// PostorderFirst looks up the first post-order node in t.
 func (t *Tree) PostorderFirst() *Node {
 	if t.root == nil {
 		return nil
 	}
-	return t.PostorderFirstChild(t.root)
+	return t.PostorderFirstNode(t.root)
 }
 
+// PostorderNext looks up the post-order successor of n.
 func (t *Tree) PostorderNext(n *Node) *Node {
 	if n.p != nil && n == n.p.left && n.p.right != nil {
 		x := n.p.right
@@ -89,12 +91,45 @@ func (t *Tree) PostorderNext(n *Node) *Node {
 	return n.p
 }
 
-func (t *Tree) PostorderFirstChild(x *Node) *Node {
+// PostorderFirstNode looks up the first post-order node in subtree whose root is x.
+func (t *Tree) PostorderFirstNode(x *Node) *Node {
 	for {
 		if x.left != nil {
 			x = x.left
 		} else if x.right != nil {
 			x = x.right
+		} else {
+			return x
+		}
+	}
+}
+
+// PreorderFirst returns the first pre-order node of t, which obviously is the root of t.
+func (t *Tree) PreorderFirst() *Node { return t.root }
+
+// PreorderNext returns the pre-order successor of x.
+func (t *Tree) PreorderNext(x *Node) *Node {
+	if x.left != nil {
+		return x.left
+	} else if x.right != nil {
+		return x.right
+	}
+	for x.p != nil {
+		if x == x.p.left && x.p.right != nil {
+			return x.p.right
+		}
+		x = x.p
+	}
+	return nil
+}
+
+// PreorderLastNode looks up the last pre-order node in subtree whose root is x.
+func (t *Tree) PreorderLastNode(x *Node) *Node {
+	for {
+		if x.right != nil {
+			x = x.right
+		} else if x.left != nil {
+			x = x.left
 		} else {
 			return x
 		}

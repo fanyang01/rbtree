@@ -18,17 +18,24 @@ type Node struct {
 	v              interface{}
 }
 
-// Value returns payload contained in n
-func (n *Node) Value() interface{} {
-	return n.v
-}
-
 // Tree is a red-black tree
 type Tree struct {
 	size    int
 	root    *Node
 	compare common.CompareFunc
 }
+
+// Left returns the left child of n
+func (n *Node) Left() *Node { return n.left }
+
+// Right returns the right child of n
+func (n *Node) Right() *Node { return n.right }
+
+// Parent returns the parent of n
+func (n *Node) Parent() *Node { return n.p }
+
+// Value returns payload contained in n
+func (n *Node) Value() interface{} { return n.v }
 
 // New creates an initialized tree.
 func New(f common.CompareFunc) *Tree {
@@ -160,7 +167,7 @@ func (t *Tree) Delete(x *Node) interface{} {
 		}(x.right)
 
 		color = y.color
-		// NOTE: it's important to update p
+		// NOTE: it's important to update p to point to parent of y.right
 		z = y.right
 		// Avoid y.p to point to y itself
 		if x.right == y {

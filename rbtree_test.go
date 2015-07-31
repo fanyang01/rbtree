@@ -32,12 +32,12 @@ func TestAssert(t *testing.T) {
 
 	for i, x := 0, tr.First(); i < n; i++ {
 		assert.NotNil(t, x)
-		assert.Equal(t, i, x.Value())
+		assert.Equal(t, i, x.Value().(int))
 		x = tr.Next(x)
 	}
 	for i, x := n-1, tr.Last(); i >= 0; i-- {
 		assert.NotNil(t, x)
-		assert.Equal(t, i, x.Value())
+		assert.Equal(t, i, x.Value().(int))
 		x = tr.Prev(x)
 	}
 
