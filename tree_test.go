@@ -11,9 +11,10 @@ import (
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func TestAssert(t *testing.T) {
+func TestTree(t *testing.T) {
 	n := 1 << 16
 	tr := New(common.CompareInt)
+
 	assert.True(t, tr.IsEmpty())
 
 	for i := 0; i < n; i++ {
@@ -26,20 +27,6 @@ func TestAssert(t *testing.T) {
 
 	_, ok := tr.Insert(0)
 	assert.False(t, ok)
-
-	assert.Nil(t, tr.Prev(tr.First()))
-	assert.Nil(t, tr.Next(tr.Last()))
-
-	for i, x := 0, tr.First(); i < n; i++ {
-		assert.NotNil(t, x)
-		assert.Equal(t, i, x.Value().(int))
-		x = tr.Next(x)
-	}
-	for i, x := n-1, tr.Last(); i >= 0; i-- {
-		assert.NotNil(t, x)
-		assert.Equal(t, i, x.Value().(int))
-		x = tr.Prev(x)
-	}
 
 	for i := n - 1; i >= n/2; i-- {
 		tr.Delete(tr.Search(i))
@@ -73,6 +60,12 @@ func TestAssert(t *testing.T) {
 	assert.Equal(t, 0, tr.Len())
 	assert.Nil(t, tr.First())
 	assert.Nil(t, tr.Last())
+
+	tr.Insert(1)
+	assert.Nil(t, tr.Root().Parent())
+	assert.Nil(t, tr.Root().Left())
+	assert.Nil(t, tr.Root().Right())
+	tr.Clean()
 
 	for i := 0; i < n; i++ {
 		random := r.Intn(n)

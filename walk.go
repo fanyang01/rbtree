@@ -11,7 +11,7 @@ type Visitor interface {
 type VisitFunc func(n *Node) bool
 
 // Visit implements the Visitor interface
-func (f WalkerFunc) Visit(n *Node) (w Visitor) {
+func (f VisitFunc) Visit(n *Node) (w Visitor) {
 	if ok := f(n); ok {
 		return f
 	}
@@ -71,8 +71,9 @@ func (t *Tree) WalkPreorder(v Visitor) {
 
 // WalkSubPreorder traverses subtree rooted at x in pre-order, x self is also visited.
 func (t *Tree) WalkSubPreorder(v Visitor, x *Node) {
-	for n := t.PreorderLastNode(x); x != n; x = t.PreorderNext(n) {
-		v = v.Visit(n)
+	var n *Node
+	for n = t.PreorderLastNode(x); x != n; x = t.PreorderNext(x) {
+		v = v.Visit(x)
 		if v == nil {
 			return
 		}
