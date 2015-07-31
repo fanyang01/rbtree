@@ -80,10 +80,7 @@ func (t *Tree) PostorderFirst() *Node {
 func (t *Tree) PostorderNext(n *Node) *Node {
 	if n.p != nil && n == n.p.left && n.p.right != nil {
 		x := n.p.right
-		for x.left != nil {
-			x = x.left
-		}
-		return x
+		return t.PostorderFirstNode(x)
 	}
 	if n.p == nil {
 		return nil
@@ -91,7 +88,7 @@ func (t *Tree) PostorderNext(n *Node) *Node {
 	return n.p
 }
 
-// PostorderFirstNode looks up the first post-order node in subtree whose root is x.
+// PostorderFirstNode looks up the first post-order node in subtree whose root is x. This node is the left-first deepest node.
 func (t *Tree) PostorderFirstNode(x *Node) *Node {
 	for {
 		if x.left != nil {
