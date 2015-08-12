@@ -3,8 +3,6 @@ package rbtree
 import (
 	"math/rand"
 	"testing"
-
-	"github.com/fanyang01/tree/common"
 )
 
 type Height struct {
@@ -14,7 +12,7 @@ type Height struct {
 
 func TestValid(t *testing.T) {
 	n := 1 << 16
-	tr := New(common.CompareInt)
+	tr := New(CompareInt)
 	for i := 0; i < n; i++ {
 		tr.Insert(i)
 	}

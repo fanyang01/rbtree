@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fanyang01/tree/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,7 +12,7 @@ var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func TestTree(t *testing.T) {
 	n := 1 << 16
-	tr := New(common.CompareInt)
+	tr := New(CompareInt)
 
 	assert.True(t, tr.IsEmpty())
 
@@ -74,7 +73,7 @@ func TestTree(t *testing.T) {
 }
 
 func BenchmarkInsert(b *testing.B) {
-	tr := New(common.CompareInt)
+	tr := New(CompareInt)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tr.Insert(i)
@@ -82,7 +81,7 @@ func BenchmarkInsert(b *testing.B) {
 }
 
 func BenchmarkSearch(b *testing.B) {
-	tr := New(common.CompareInt)
+	tr := New(CompareInt)
 	for i := 0; i < b.N; i++ {
 		tr.Insert(i)
 	}
@@ -93,7 +92,7 @@ func BenchmarkSearch(b *testing.B) {
 }
 
 func BenchmarkDelete(b *testing.B) {
-	tr := New(common.CompareInt)
+	tr := New(CompareInt)
 	for i := 0; i < b.N; i++ {
 		tr.Insert(i)
 	}

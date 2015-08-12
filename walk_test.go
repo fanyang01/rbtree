@@ -3,13 +3,12 @@ package rbtree
 import (
 	"testing"
 
-	"github.com/fanyang01/tree/common"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestWalk(t *testing.T) {
 	n := 1 << 10
-	tr := New(common.CompareInt)
+	tr := New(CompareInt)
 	for i := 0; i < n; i++ {
 		tr.Insert(i)
 	}

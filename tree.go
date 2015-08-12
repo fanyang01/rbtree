@@ -3,8 +3,6 @@ Package rbtree implements red-black tree introduced in "Introduction to Algorith
 */
 package rbtree
 
-import "github.com/fanyang01/tree/common"
-
 // BLACK and RED is the color of nodes
 const (
 	BLACK = false
@@ -22,7 +20,7 @@ type Node struct {
 type Tree struct {
 	size    int
 	root    *Node
-	compare common.CompareFunc
+	compare CompareFunc
 }
 
 // Left returns the left child of n
@@ -38,7 +36,7 @@ func (n *Node) Parent() *Node { return n.p }
 func (n *Node) Value() interface{} { return n.v }
 
 // New creates an initialized tree.
-func New(f common.CompareFunc) *Tree {
+func New(f CompareFunc) *Tree {
 	return &Tree{
 		size:    0,
 		root:    nil,
