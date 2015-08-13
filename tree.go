@@ -160,22 +160,51 @@ func (t *Tree) Delete(x *Node) interface{} {
 		z, p = x.left, x.p
 		t.transplant(x, x.left)
 	} else {
-		// y is the maximum node on x's right subtree
-		// it will replace x
-		y := func(n *Node) *Node {
-			for n.left != nil {
-				n = n.left
-			}
-			return n
-		}(x.right)
+		// y is the maximum node on x's right subtree,
+		// it will replace x.
+		y := x.right
+		for y.left != nil {
+			y = y.left
+		}
 
 		color = y.color
 		// NOTE: it's important to update p to point to parent of y.right
 		z = y.right
-		// Avoid y.p to point to y itself
 		if x.right == y {
+			/*
+			 * y is right child of x
+			 *
+			 *           x
+			 *         /   \
+			 *        l     y
+			 *               \
+			 *                z
+			 *  -->
+			 *           y
+			 *         /   \
+			 *        l     z
+			 */
 			p = y
 		} else {
+			/*
+			 *            x
+			 *          /   \
+			 *         l     r
+			 *              /
+			 *            ...
+			 *            /
+			 *           y
+			 *            \
+			 *             z
+			 * -->
+			 *            y
+			 *          /   \
+			 *         l     r
+			 *              /
+			 *            ...
+			 *            /
+			 *           z
+			 */
 			t.transplant(y, y.right)
 			p = y.p
 			y.right = x.right
