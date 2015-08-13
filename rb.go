@@ -4,6 +4,11 @@ package rbtree
 func isRed(n *Node) bool   { return n != nil && n.color == RED }
 func isBlack(n *Node) bool { return n == nil || n.color == BLACK }
 
+func (t *Tree) argumentRotate(p, x *Node) {
+	t.updateArg(p)
+	t.updateArg(x)
+}
+
 func (t *Tree) insertFix(x *Node) {
 	var y *Node
 

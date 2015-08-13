@@ -16,11 +16,14 @@ type Node struct {
 	v              interface{}
 }
 
+type ArgFunc func(*Node) interface{}
+
 // Tree is a red-black tree
 type Tree struct {
-	size    int
-	root    *Node
-	compare CompareFunc
+	size      int
+	root      *Node
+	compare   CompareFunc
+	updateArg ArgFunc
 }
 
 // Left returns the left child of n
@@ -36,11 +39,12 @@ func (n *Node) Parent() *Node { return n.p }
 func (n *Node) Value() interface{} { return n.v }
 
 // New creates an initialized tree.
-func New(f CompareFunc) *Tree {
+func New(cmp CompareFunc, arg ArgFunc) *Tree {
 	return &Tree{
-		size:    0,
-		root:    nil,
-		compare: f,
+		size:      0,
+		root:      nil,
+		compare:   cmp,
+		updateArg: arg,
 	}
 }
 
@@ -132,6 +136,12 @@ func (t *Tree) Insert(v interface{}) (*Node, bool) {
 	} else {
 		p.right = n
 	}
+
+	// Update argument buttom-up
+	for x := n; x != nil; x = x.p {
+		t.updateArg(x)
+	}
+
 	t.insertFix(n)
 	t.size++
 	return n, true
