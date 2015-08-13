@@ -12,7 +12,7 @@ func (t *Tree) insertFix(x *Node) {
 			y = x.p.p.right
 			if isRed(y) {
 				/*
-				 * [BLACK] RED (ANY) -> x <-
+				 * [BLACK] RED (ANY)
 				 *
 				 * 1.
 				 *              [g]
@@ -43,9 +43,9 @@ func (t *Tree) insertFix(x *Node) {
 					 * --->
 					 *             [g]
 					 *            /   \
-					 *        -> x    [y]
+					 *           x    [y]
 					 *          /
-					 *         p
+					 *      -> p
 					 */
 					x = x.p
 					t.leftRotate(x)
