@@ -11,16 +11,16 @@ type Node struct {
 	left, right, p *Node
 	color          bool
 	v              interface{}
+	Argument       interface{}
 }
-
-type ArgFunc func(*Node) interface{}
 
 // Tree is a red-black tree
 type Tree struct {
-	size      int
-	root      *Node
-	compare   CompareFunc
-	updateArg ArgFunc
+	size    int
+	root    *Node
+	compare CompareFunc
+	cmpArg  CompareFunc
+	compute func(*Node)
 }
 
 // Left returns the left child of n
@@ -36,12 +36,13 @@ func (n *Node) Parent() *Node { return n.p }
 func (n *Node) Value() interface{} { return n.v }
 
 // New creates an initialized tree.
-func New(cmp CompareFunc, arg ArgFunc) *Tree {
+func New(cmp, cmpArg CompareFunc, compute func(*Node)) *Tree {
 	return &Tree{
-		size:      0,
-		root:      nil,
-		compare:   cmp,
-		updateArg: arg,
+		size:    0,
+		root:    nil,
+		compare: cmp,
+		compute: compute,
+		cmpArg:  cmpArg,
 	}
 }
 
@@ -134,10 +135,8 @@ func (t *Tree) Insert(v interface{}) (*Node, bool) {
 		p.right = n
 	}
 
-	// Update argument buttom-up
-	for x := n; x != nil; x = x.p {
-		t.updateArg(x)
-	}
+	// Update argument bottom-up
+	t.propagate(n)
 
 	t.insertFix(n)
 	t.size++
@@ -157,7 +156,7 @@ func (t *Tree) DeleteValue(v interface{}) (interface{}, bool) {
 func (t *Tree) Delete(x *Node) interface{} {
 	// z is the node that is MOVED to a new place,
 	// and color is the color of the node previously in this place.
-	var z, p *Node
+	var y, z, p *Node
 	color := x.color
 
 	if x.left == nil {
@@ -169,7 +168,7 @@ func (t *Tree) Delete(x *Node) interface{} {
 	} else {
 		// y is the maximum node on x's right subtree,
 		// it will replace x.
-		y := x.right
+		y = x.right
 		for y.left != nil {
 			y = y.left
 		}
@@ -222,6 +221,13 @@ func (t *Tree) Delete(x *Node) interface{} {
 		t.transplant(x, y)
 		y.color = x.color
 	}
+
+	// Update argument bottom-up
+	t.propagate(p)
+	if y != nil {
+		t.propagate(y)
+	}
+
 	if color == BLACK {
 		t.deleteFix(p, z)
 	}

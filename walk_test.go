@@ -8,7 +8,7 @@ import (
 
 func TestWalk(t *testing.T) {
 	n := 1 << 10
-	tr := New(CompareInt)
+	tr := New(compareInt, cmpArg, argFunc)
 	for i := 0; i < n; i++ {
 		tr.Insert(i)
 	}

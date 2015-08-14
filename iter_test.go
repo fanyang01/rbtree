@@ -8,7 +8,7 @@ import (
 
 func TestIter(t *testing.T) {
 	n := 1 << 10
-	tr := New(CompareInt)
+	tr := New(compareInt, cmpArg, argFunc)
 
 	assert.Nil(t, tr.PostorderFirst())
 	assert.Nil(t, tr.PreorderFirst())
