@@ -8,11 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+var (
+	r = rand.New(rand.NewSource(time.Now().UnixNano()))
+)
 
 func TestTree(t *testing.T) {
 	n := 1 << 16
-	tr := New(CompareInt)
+	tr := New(compareInt, cmpArg, argFunc)
 
 	assert.True(t, tr.IsEmpty())
 
@@ -73,7 +75,7 @@ func TestTree(t *testing.T) {
 }
 
 func BenchmarkInsert(b *testing.B) {
-	tr := New(CompareInt)
+	tr := New(compareInt, cmpArg, argFunc)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tr.Insert(i)
@@ -81,7 +83,7 @@ func BenchmarkInsert(b *testing.B) {
 }
 
 func BenchmarkSearch(b *testing.B) {
-	tr := New(CompareInt)
+	tr := New(compareInt, cmpArg, argFunc)
 	for i := 0; i < b.N; i++ {
 		tr.Insert(i)
 	}
@@ -92,7 +94,7 @@ func BenchmarkSearch(b *testing.B) {
 }
 
 func BenchmarkDelete(b *testing.B) {
-	tr := New(CompareInt)
+	tr := New(compareInt, cmpArg, argFunc)
 	for i := 0; i < b.N; i++ {
 		tr.Insert(i)
 	}

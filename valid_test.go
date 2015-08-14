@@ -12,7 +12,7 @@ type Height struct {
 
 func TestValid(t *testing.T) {
 	n := 1 << 16
-	tr := New(CompareInt)
+	tr := New(compareInt, cmpArg, argFunc)
 	for i := 0; i < n; i++ {
 		tr.Insert(i)
 	}

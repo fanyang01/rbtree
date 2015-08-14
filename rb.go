@@ -4,9 +4,15 @@ package rbtree
 func isRed(n *Node) bool   { return n != nil && n.color == RED }
 func isBlack(n *Node) bool { return n == nil || n.color == BLACK }
 
-func (t *Tree) argumentRotate(p, x *Node) {
-	t.updateArg(p)
-	t.updateArg(x)
+func (t *Tree) propagate(x *Node) {
+	for x != nil {
+		old := x.Argument
+		t.compute(x)
+		if t.cmpArg(x.Argument, old) == 0 {
+			break
+		}
+		x = x.p
+	}
 }
 
 func (t *Tree) insertFix(x *Node) {
@@ -54,6 +60,7 @@ func (t *Tree) insertFix(x *Node) {
 					 */
 					x = x.p
 					t.leftRotate(x)
+					t.compute(x)
 				}
 				/*
 				 * 3.
@@ -72,6 +79,7 @@ func (t *Tree) insertFix(x *Node) {
 				x.p.color = BLACK
 				x.p.p.color = RED
 				t.rightRotate(x.p.p)
+				t.propagate(x.p.right)
 			}
 		} else {
 			y = x.p.p.left
@@ -84,10 +92,12 @@ func (t *Tree) insertFix(x *Node) {
 				if x == x.p.left {
 					x = x.p
 					t.rightRotate(x)
+					t.compute(x)
 				}
 				x.p.color = BLACK
 				x.p.p.color = RED
 				t.leftRotate(x.p.p)
+				t.propagate(x.p.left)
 			}
 		}
 	}
@@ -119,6 +129,8 @@ func (t *Tree) deleteFix(p, x *Node) {
 				y.color = BLACK
 				p.color = RED
 				t.leftRotate(p)
+				t.compute(p)
+				t.propagate(y)
 				y = p.right
 			}
 			if isBlack(y.right) && isBlack(y.left) {
@@ -162,6 +174,7 @@ func (t *Tree) deleteFix(p, x *Node) {
 					y.left.color = BLACK
 					y.color = RED
 					t.rightRotate(y)
+					t.compute(y)
 					y = p.right
 				}
 				/*
@@ -182,6 +195,8 @@ func (t *Tree) deleteFix(p, x *Node) {
 				p.color = BLACK
 				y.right.color = BLACK
 				t.leftRotate(p)
+				t.compute(p)
+				t.propagate(y)
 				x, p = t.root, nil
 			}
 		} else {
@@ -190,6 +205,8 @@ func (t *Tree) deleteFix(p, x *Node) {
 				y.color = BLACK
 				p.color = RED
 				t.rightRotate(p)
+				t.compute(p)
+				t.propagate(y)
 				y = p.left
 			}
 			if isBlack(y.left) && isBlack(y.right) {
@@ -200,12 +217,15 @@ func (t *Tree) deleteFix(p, x *Node) {
 					y.right.color = BLACK
 					y.color = RED
 					t.leftRotate(y)
+					t.compute(y)
 					y = p.left
 				}
 				y.color = p.color
 				p.color = BLACK
 				y.left.color = BLACK
 				t.rightRotate(p)
+				t.compute(p)
+				t.propagate(y)
 				x, p = t.root, nil
 			}
 		}
