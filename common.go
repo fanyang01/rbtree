@@ -21,6 +21,8 @@ This package uses callbacks.
 */
 package rbtree
 
+import "unsafe"
+
 // CompareFunc compares x and y, and returns an integer
 // = 0 if x is equal to y,
 // > 0 if x is greater than y, and
@@ -34,7 +36,14 @@ var (
 )
 
 func compareInt(x, y interface{}) int {
-	a, b := x.(int), y.(int)
+	type tempIface struct {
+		typ  unsafe.Pointer
+		data unsafe.Pointer
+	}
+	aa := (*tempIface)(unsafe.Pointer(&x))
+	bb := (*tempIface)(unsafe.Pointer(&y))
+	a := *((*int)(aa.data))
+	b := *((*int)(bb.data))
 	if a > b {
 		return 1
 	} else if a < b {
