@@ -14,8 +14,9 @@ Under current language spec, there are following patterns to implement generic c
 
 3) using `go generate` to generate code for specific type.
 
-This package uses callbacks. Using tricks to get pointer of empty interface values can avoid data copying and greatly improve performance.
-It's your responsibility to assure type safe.
+This package uses callbacks. Using tricks to get pointer of empty interface
+values can avoid data copying and runtime assertions, therefore greatly improve
+performance.  It's your responsibility to assure type safe.
 */
 package rbtree
 
