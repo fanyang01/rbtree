@@ -1,3 +1,9 @@
+# rbtree
+
+> See branch **[argument](https://github.com/fanyang01/rbtree/tree/argument)** for argumented red-black tree.
+
+------
+
 Package rbtree implements red-black tree introduced in "Introduction to Algorithms".
 
 Under current language spec, there are following patterns to implement generic containers:
@@ -18,8 +24,9 @@ Under current language spec, there are following patterns to implement generic c
 
 3) using `go generate` to generate code for specific type.
 
-This package uses callbacks. Using tricks to get pointer of empty interface values can avoid data copying and greatly improve performance.
-It's your responsibility to assure type safe.
+This package uses callbacks. Using tricks to get pointer of empty interface
+values can avoid data copying and runtime assertiions, therefore greatly improve
+performance. It's your responsibility to assure type safe.
 
 ```go
 	// ValuePtr is a helper function to get the pointer to value stored in
