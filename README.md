@@ -1,9 +1,5 @@
 # rbtree
 
-> See branch **[argument](https://github.com/fanyang01/rbtree/tree/argument)** for argumented red-black tree.
-
-------
-
 Package rbtree implements red-black tree introduced in "Introduction to Algorithms".
 
 Under current language spec, there are following patterns to implement generic containers:
