@@ -1,8 +1,8 @@
 # rbtree
 
-> See branch **[argument](https://github.com/fanyang01/rbtree/tree/argument)** for argumented red-black tree.
+[![GoDoc](https://godoc.org/github.com/fanyang01/rbtree?status.svg)](https://godoc.org/github.com/fanyang01/rbtree)
 
-------
+> See branch **[argument](https://github.com/fanyang01/rbtree/tree/argument)** for argumented red-black tree.
 
 Package rbtree implements red-black tree introduced in "Introduction to Algorithms".
 
