@@ -1,6 +1,3 @@
-/*
-Package rbtree implements red-black tree introduced in "Introduction to Algorithms".
-*/
 package rbtree
 
 // BLACK and RED is the color of nodes
