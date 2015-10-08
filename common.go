@@ -20,10 +20,7 @@ performance.  It's your responsibility to assure type safe.
 */
 package rbtree
 
-import (
-	"strings"
-	"unsafe"
-)
+import "unsafe"
 
 // CompareFunc compares x and y, and returns an integer
 // = 0 if x is equal to y,
@@ -50,17 +47,16 @@ func ValuePtr(v interface{}) unsafe.Pointer {
 func compareInt(x, y interface{}) int {
 	a := *(*int)(ValuePtr(x))
 	b := *(*int)(ValuePtr(y))
-	if a > b {
-		return 1
-	} else if a < b {
-		return -1
-	} else {
-		return 0
-	}
+	return a - b
 }
 
 func compareString(x, y interface{}) int {
 	a := *(*string)(ValuePtr(x))
 	b := *(*string)(ValuePtr(y))
-	return strings.Compare(a, b)
+	if a > b {
+		return +1
+	} else if a < b {
+		return -1
+	}
+	return 0
 }

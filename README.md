@@ -1,6 +1,4 @@
-# rbtree
-
-[![GoDoc](https://godoc.org/github.com/fanyang01/rbtree?status.svg)](https://godoc.org/github.com/fanyang01/rbtree)
+# rbtree [![GoDoc](https://godoc.org/github.com/fanyang01/rbtree?status.svg)](https://godoc.org/github.com/fanyang01/rbtree) [![Build Status](https://drone.io/github.com/fanyang01/rbtree/status.png)](https://drone.io/github.com/fanyang01/rbtree/latest)
 
 > See branch **[master](https://github.com/fanyang01/rbtree)** for non-argumented red-black tree.
 
